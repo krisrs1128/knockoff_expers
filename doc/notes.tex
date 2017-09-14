@@ -36,6 +36,9 @@ applied in different settings or to provide different interpretations
 \section{Background}
 \label{sec:background}
 
+Before proceeding to microbiome-specific applications, we review the standard
+setup and results shared across the knockoffs literature.
+
 Standard knockoffs
 - setup notation and definitions
 - define procedure
@@ -58,6 +61,44 @@ Model-free knockoffs
 
 \section{LDA count model}
 \label{sec:lda_count_model}
+
+Suppose $X \sim LDA\left(K, \alpha\right)$ is an $n \times p$ matrix of counts,
+by which we mean that the $n$ rows of $X$ are drawn according to the LDA data
+generating mechanism with $K$ topics and $\theta_{i} \sim
+\Dir\left(\alpha\right)$. Denote the columns of $X$ by $x_{1}, \dots, x_{p}$.
+
+To develop model-free knockoffs $\tilde{x}_{1}, \dots, \tilde{x}_{p}$ for a
+single row, we can use SCIP, sequentially sampling $\tilde{x}_{j} \sim
+\mathcal{L}\left(x_{j} \vert x_{-j}, \tilde{x}_{1:j - 1}\right)$ for $j = 1,
+\dots, p$. For the first knockoff, we can sample
+\begin{align}
+  \label{eq:first_lda_knockoff}
+  \tilde{x}_{1} \sim p\left(x_{1} \vert x_{2:p}\right) &= \int p\left(x_{1} \vert \tilde{\theta}\right)p\left(\tilde{\theta} \vert x_{2:p}\right) d\tilde{\theta}
+\end{align}
+
+We can use a LDA mean-field approximation to sample from $p\left(\tilde{\theta}
+\vert x_{2:p}\right)$,
+\begin{align*}
+  \tilde{\theta} &\sim \Dir\left(\left(\alpha_{k} + \sum_{v = 2}^{p} x_{iv} \tilde{c}_{ivk}\right)_{k= 1}^{K}\right),
+\end{align*}
+where $\tilde{c}_{ivk}$ are variational parameters interpreted as the count
+breakdown of a single species abundance across topics. Following equation
+\ref{eq:first_lda_knockoff}, we can then sample $x_{iv} \sim \Poi\left(\sum_{k}
+\theta_{ik} \bar{\beta}_{kv}\right)$, where $\bar{\beta}_{k}$ is the
+normalized version of $\beta_{k}$ after removing the first word.
+
+For subsequent knockoffs, we have to make further approximations. For example,
+suppose we want to sample from $\mathcal{L}\left(x_{2} \vert x_{1}, x_{3:p},
+\tilde{x}_{1}\right)$. This is difficult because we have lost information on
+both the true $\theta$ and knockoff $\tilde{\theta}$. One approach is to sample
+instead from $\mathcal{L}\left(x_{2} \vert x_{1}, x_{3:p}\right)$ using the same
+strategy as above. Alternatively, we could consider sampling 
+\begin{align*}
+ \tilde{\theta}_{i} &\sim \Dir\left(\left(\alpha_{k} + \sum_{v \neq 2} \tilde{c}_{ivk} x_{iv} + \tilde{x}_{i1}\tilde{c}_{i1k}\right)_{k = 1}^{K}\right) 
+\end{align*}
+which also takes the topic information of the first knockoff into consideration.
+Note that this requires refitting (or at least updating) the LDA model for each
+new knockoff.
 
 \bibliographystyle{plainnat}
 \bibliography{refs.bib}

@@ -8,6 +8,20 @@
 
 \begin{document}
 
+There is a tension between modeling and inference in microbiome data analysis.
+On the one hand, it has become possible to detect and model complex
+relationships between patterns of species abundance and medical characteristics
+of interest. However, formal descriptions of the uncertainty associated with
+model estimates remains out of reach for all but the simplest (say, generalized
+linear or PERMANOVA) models, and typically, to do inference in microbiome
+studies, researchers fall back to some type of marginal testing with FDR
+control.
+
+The purpose of this note is to describe recent efforts to bridge this gap, based
+on the ``knockoffs'' procedure of \citep{}, and to explore the applicability
+(and remaining limitations) of recently proposed methods in the microbiome data
+analysis context.
+
 Motivation: microbiome species abundance vs. sample characteristics
 
 - has become common to use modeling to study joint abundances -> characteristics
